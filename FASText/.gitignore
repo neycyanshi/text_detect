@@ -1,0 +1,5 @@
+/Release/
+/CMakeLists.txt~
+/perf.data
+/perf.data.old
+/Debug/
