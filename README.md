@@ -1,8 +1,8 @@
-## Multi-language text area segmentation.
+## Multi-language text area segmentation
 
 ### Introduction
 - Pretrained CNN for area extraction.
-- FASText for stroke detector.
+- Fine-grained stroke detector.
 - Adapted for presswork with large scale and high resolution.
 
 ### Demo
