@@ -71,7 +71,7 @@ weight_path = os.path.join(model_root, 'hed_pretrained_bsds.caffemodel')
 net = caffe.Net(net_path, weight_path, caffe.TEST)
 
 # starttime = time.time()
-vis_time = 10
+vis_time = 2000
 for idx in range(0, len(im_lst)):
     print('{} | processing: {}'.format(idx, test_lst[idx]))
     in_ = im_lst[idx]
