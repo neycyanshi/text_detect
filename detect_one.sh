@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-DATA="./ori"
+DATA="ori"
 IMG=$1
-DST1="./p1_out"
-DST2="./p2_out"
+DST1="p1_out"
+DST2="p2_out"
 #WRN='wrn.txt'
 
 CUDA_VISIBLE_DEVICES=0 python src/demo.py \

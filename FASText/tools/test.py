@@ -25,13 +25,15 @@ def find_rect(cnt,T):
     box = np.int0(cv2.boxPoints(rect))
     return box
 
-def draw_contours(imgFile,srcFile,dstFile,pic):
-    img = cv2.imread(srcFile+'/'+pic)
-    imgc = cv2.imread(imgFile+'/'+pic[:-9]+'.png')
-    imgd = dstFile + '/' + pic[:-9]+'.png'
-    
 
-    #print(out)
+def draw_contours_pic(imgFile, srcFile, dstFile, pic):
+    img = cv2.imread(srcFile + '/' + pic)  # p1_out ndarry (H, W, 3)
+    imgc = cv2.imread(imgFile + '/' + pic[:-9] + '.png')  # ori ndarry (H, W, 3)
+    imgd = dstFile + '/' + pic[:-9] + '.png'  # p2_out path
+    draw_contours(imgc, img, imgd)
+
+
+def draw_contours(imgc, img, imgd):
     segmentations = ft.getCharSegmentations(cv2.cvtColor(imgc,cv2.COLOR_BGR2GRAY), outputDir, 'base')
     keypoints = ft.getLastDetectionKeypoints()   
     octave0Points = keypoints[keypoints[:,2] == 0,:]
@@ -73,7 +75,7 @@ def draw_contours(imgFile,srcFile,dstFile,pic):
     
     ss = np.zeros(gray.shape,np.uint8)
     cv2.drawContours(ss,contours,-1,255,-1)
-    cv2.imwrite(dstFile+'/'+pic[:-9]+'mask.png',ss)
+    cv2.imwrite(p2_out_dir+'/' + os.path.basename(imgd).split('.')[0]+'mask.png',ss)
     
     # cv2.imwrite(dstFile+'/'+pic[:-9]+'fuse0.png',img)
 
@@ -85,31 +87,46 @@ if __name__ == '__main__':
     T = 0.8
     gray_threshold = 180
 
-    ft = FASTex(edgeThreshold= edgeThreshold, nlevels=-1, minCompSize = 4)
+    ft = FASTex(edgeThreshold=edgeThreshold, nlevels=-1, minCompSize=4)
     
-    imgName = '/datagrid/personal/TextSpotter/evaluation-sets/bornDigital/img_100.png'
-        
-    if len(sys.argv) == 1:
+    # imgName = '/datagrid/personal/TextSpotter/evaluation-sets/bornDigital/img_100.png'
+    # print('='*10 + 'stroke detecting' + '='*10)
+    ori_dir = 'ori'
+    p1_out_dir = 'p1_out'
+    p2_out_dir = 'p2_out'
+
+    if len(sys.argv) == 2:
         if sys.argv[1].endswith(".png") or sys.argv[1].endswith(".jpg"):
             imgName = sys.argv[1]
-    if len(sys.argv) >= 2:
-            imgFile = sys.argv[1]
-            srcFile = sys.argv[2]
-            dstFile = sys.argv[3]
-    print imgFile,srcFile,dstFile
-    if not os.path.isdir(dstFile):
-        os.makedirs(dstFile)
-    starttime = time.time()
-    n_im = 0
-    for pic in os.listdir(srcFile):
-        if pic.endswith("fuse0.png"):
-            n_im += 1
-            draw_contours(imgFile,srcFile,dstFile,pic)
-    endtime = time.time()
-    total_time = endtime - starttime
-    print('='*10)
-    print 'stroke detect total time: {} for {} imgs.'.format(total_time, n_im)
-    print('stroke detect avg_time: {}'.format(total_time / n_im))
-    print('='*10)
+        else:
+            print('please input image file name.')
+        starttime = time.time()
+        img_id = os.path.basename(imgName).split('.')[0]
+        # print(os.path.join(p1_out_dir, '{}fuse0.png'.format(img_id)))
+        img = cv2.imread(os.path.join(p1_out_dir, '{}fuse0.png'.format(img_id)))  # p1_out ndarry (H, W, 3)
+        imgc = cv2.imread(os.path.join(imgName))  # ori ndarry (H, W, 3)
+        imgd = os.path.join(p2_out_dir, '{}.png'.format(img_id))  # p2_out path
+        draw_contours(imgc, img, imgd)
+        print('time elapsed: {}'.format(time.time() - starttime))
+    elif len(sys.argv) == 4:
+        imgFile = sys.argv[1]
+        srcFile = sys.argv[2]
+        dstFile = sys.argv[3]
+        print imgFile,srcFile,dstFile
+        if not os.path.isdir(dstFile):
+            os.makedirs(dstFile)
+        starttime = time.time()
+        n_im = 0
+        for pic in os.listdir(srcFile):
+            if pic.endswith("fuse0.png"):
+                n_im += 1
+                draw_contours_pic(imgFile,srcFile,dstFile,pic)
+        endtime = time.time()
+        total_time = endtime - starttime
+        print 'stroke detect total time: {} for {} imgs.'.format(total_time, n_im)
+        print('stroke detect avg_time: {}'.format(total_time / n_im))
+    else:
+        print('invalid input arguments.')
+    print('='*35)
 
-    #draw_keypoints(imgc, octavePoints, edgeThreshold, inter = True, color = 0)
+    # draw_keypoints(imgc, octavePoints, edgeThreshold, inter = True, color = 0)
