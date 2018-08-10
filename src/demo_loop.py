@@ -38,7 +38,7 @@ data_root = args.data_root
 if args.img_name is not None:
     test_lst = [os.path.join(data_root, args.img_name)]
 else:
-    test_lst = glob(data_root+'*.png')
+    test_lst = glob(os.path.join(data_root, '*.png'))
 name_lst = [os.path.basename(x).split('.')[0] for x in test_lst]
 #print('test_lst: {}'.format(test_lst))
 #print('name_lst: {}'.format(name_lst))
